@@ -47,6 +47,15 @@
 		</p>
 	
 	</security:authorize>
+
+	<security:authorize access="hasRole('DIRECTOR')">
+
+		<p>
+			<a href="${pageContext.request.contextPath}/directors">Information page just for Directors</a>
+			(Only for Directors)
+		</p>
+
+	</security:authorize>
 	
 	<hr>
 	
