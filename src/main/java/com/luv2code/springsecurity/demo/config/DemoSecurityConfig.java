@@ -1,28 +1,25 @@
 package com.luv2code.springsecurity.demo.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.stereotype.Controller;
+import javax.sql.DataSource;
 
-import java.net.HttpURLConnection;
 @Configuration
 @EnableWebSecurity
 public class DemoSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    @Autowired
+    DataSource dataSource;
     @Override
     protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
 
-        User.UserBuilder userBuilder = User.withDefaultPasswordEncoder();
-
-        authenticationManagerBuilder.inMemoryAuthentication()
-                .withUser(userBuilder.username("nick").password("test1").roles("EMPLOYEE"))
-                .withUser(userBuilder.username("vadim").password("test2").roles("EMPLOYEE", "MANAGER"))
-                .withUser(userBuilder.username("sorin").password("test3").roles("ADMIN", "EMPLOYEE"))
-                .withUser(userBuilder.username("director").password("director1").roles("EMPLOYEE", "DIRECTOR"));
+      authenticationManagerBuilder.jdbcAuthentication().dataSource(dataSource)
+              .usersByUsernameQuery("select username, password, enabled from users where username=?")
+              .authoritiesByUsernameQuery("select username, authority from authorities where username=?");
     }
 
     @Override
